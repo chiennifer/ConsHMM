@@ -11,6 +11,7 @@ library(yaml)
 library(tidyr)
 library(dplyr)
 library(pheatmap)
+library(heatmaply) #You may also need to install pandoc (https://pandoc.org/installing.html)
 ```
 
 Input parameters
@@ -117,6 +118,15 @@ OLO_clustering = function(hc, mat) {
 }
 ```
 
+Basic formatting for column names at bottom and within the groupings at the top to be common names. (this needs to be changed for different MSAs)
+
+``` r
+for (i in 101:199){
+newcolnames[i] = paste(" ", newcolnames[i])
+}
+rownames(annotation_col) = newcolnames[-1]
+```
+
 Heatmap plotting
 ----------------
 
@@ -128,6 +138,10 @@ colnames(emissions_columns_reordered) = c("state", columns$fullName)
 annotation_col = columns %>% select(group)
 rownames(annotation_col) = columns$fullName
 
+#This is specific to the heatmaply interactive mapping
+heatmaply(emissions_columns_reordered[,-1], xlab="Species Names\nAligned(left), Matched(right)", ylab="Conservation States", main="Heatmap of Conservation State by Species",  key.title="Emission\nProbability", Colv = FALSE, labCol = newcolnames[-1], file = outputFileName, k_row=6, scale_fill_gradient_fun = ggplot2::scale_fill_gradient2(low = "blue", high = "red", midpoint=0.5),   col_side_colors = annotation_col)
+
+#This is specific to using pheatmap to create the static map
 # Section below allows for diagonal column names in the pheatmap package (from StackOverflow)
 # Edit body of pheatmap:::draw_colnames, customizing it to your liking
 draw_colnames_45 <- function (coln, ...) {
